@@ -6,8 +6,6 @@ import com.ds.expensetracker.authentication.repository.UserRepository;
 import com.ds.expensetracker.cashbook.dto.CashbookDto;
 import com.ds.expensetracker.cashbook.model.Cashbook;
 import com.ds.expensetracker.cashbook.repository.CashbookRepository;
-import com.ds.expensetracker.exception.cashbook.DuplicateCashbookException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -19,41 +17,41 @@ import java.util.List;
 @Transactional
 public class CashbookService {
 
-    @Autowired
-    private CashbookRepository cashbookRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final CashbookRepository cashbookRepository;
+    private final UserRepository userRepository;
+    private final CashbookValidationService cashbookValidationService;
+
+    public CashbookService(CashbookRepository cashbookRepository, UserRepository userRepository, CashbookValidationService cashbookValidationService) {
+        this.cashbookRepository = cashbookRepository;
+        this.userRepository = userRepository;
+        this.cashbookValidationService = cashbookValidationService;
+    }
 
     public CashbookDto createCashbookEntry(String emailId, Cashbook cashbook) {
+        User user = getUserByEmailId(emailId);
 
-    User user=userRepository.findByEmailId(emailId).orElseThrow(()->new UsernameNotFoundException("User not found"));
-    cashbook.setUser(user);
+        cashbookValidationService.validateDuplicateCashbookName(cashbook.getCashbookName(), user);
 
-      if (cashbookRepository.existsByCashbookNameAndUser(cashbook.getCashbookName(),user)) {
-          throw new DuplicateCashbookException("Cashbook with name '" + cashbook.getCashbookName() + "' already exists");
-      }
+        cashbook.setUser(user);
+        Cashbook savedCashbook = cashbookRepository.save(cashbook);
 
-      Cashbook savedCashbook=cashbookRepository.save(cashbook);
-
-      CashbookDto cashbookDto=new CashbookDto();
-      cashbookDto.setStatus("Success");
-      cashbookDto.setMessage("Cashbook Created Successfully");
-
-      return cashbookDto;
-
+        CashbookDto cashbookDto = new CashbookDto();
+        cashbookDto.setStatus("Success");
+        cashbookDto.setMessage("Cashbook Created Successfully");
+        return cashbookDto;
     }
 
     public CashbookDto<List<Cashbook>> getAllCashbookOfUser(String emailId) {
+        User user = getUserByEmailId(emailId);
+        List<Cashbook> cashbookList = cashbookRepository.findAllByUserAndActiveFlag(user, 1);
 
-        User user=userRepository.findByEmailId(emailId).orElseThrow(()->new UsernameNotFoundException("User not found"));
-        List<Cashbook> cashbookList=cashbookRepository.findAllByUserAndActiveFlag(user,1);
-        CashbookDto cashbookDto=new CashbookDto();
-
+        CashbookDto cashbookDto = new CashbookDto();
         cashbookDto.setStatus("Success");
-        if(cashbookList.isEmpty()){
+
+        if (cashbookList.isEmpty()) {
             cashbookDto.setMessage("No Cashbook found");
-        }else{
+        } else {
             cashbookDto.setData(cashbookList);
         }
 
@@ -62,15 +60,10 @@ public class CashbookService {
 
 
     public CashbookDto updateCashbookEntry(long cashbookPkId, Cashbook cashbook) {
+        cashbookValidationService.validateCashbookOwnership(cashbookPkId, getCurrentUserEmailId());
+
         Cashbook existingCashbook = (Cashbook) cashbookRepository.findByCashbookPkIdAndActiveFlag(cashbookPkId, 1)
                 .orElseThrow(() -> new RuntimeException("Cashbook not found"));
-
-        // Check if the user making the request is the owner of the cashbook
-        String emailId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (!existingCashbook.getUser().getEmailId().equals(emailId)) {
-            throw new RuntimeException("Unauthorized access to update Cashbook");
-        }
 
         existingCashbook.setCashbookName(cashbook.getCashbookName());
         Cashbook updatedCashbook = cashbookRepository.save(existingCashbook);
@@ -83,22 +76,26 @@ public class CashbookService {
     }
 
     public CashbookDto deleteCashbookEntry(long cashbookPkId) {
+        cashbookValidationService.validateCashbookOwnership(cashbookPkId, getCurrentUserEmailId());
 
         Cashbook existingCashbook = cashbookRepository.findById(cashbookPkId)
                 .orElseThrow(() -> new RuntimeException("Cashbook not found"));
 
-        // Check if the user making the request is the owner of the cashbook
-        String emailId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (!existingCashbook.getUser().getEmailId().equals(emailId)) {
-            throw new RuntimeException("Unauthorized access to update Cashbook");
-        }
-
         existingCashbook.setActiveFlag(0);
+        cashbookRepository.save(existingCashbook);
 
         CashbookDto responseDto = new CashbookDto();
         responseDto.setStatus("Success");
         responseDto.setMessage("Cashbook Deleted Successfully");
         return responseDto;
+    }
+
+    private User getUserByEmailId(String emailId) {
+        return userRepository.findByEmailId(emailId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    private String getCurrentUserEmailId() {
+        return (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

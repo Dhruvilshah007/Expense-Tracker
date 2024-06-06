@@ -14,4 +14,7 @@ public interface CashbookRepository extends JpaRepository<Cashbook,Long> {
     List<Cashbook> findAllByUserAndActiveFlag(User user, int activeFlag);
 
     Optional<Object> findByCashbookPkIdAndActiveFlag(long cashbookPkId, int activeFlag);
+
+
+    boolean existsByCashbookPkIdAndUser(long cashbookPkId, User user);
 }

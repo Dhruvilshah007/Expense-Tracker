@@ -1,9 +1,14 @@
 package com.ds.expensetracker.authentication.model;
 
+import com.ds.expensetracker.cashbook.model.Cashbook;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -37,9 +42,9 @@ public class User extends BaseEntity implements UserDetails {
     private Date birthDate;
     private byte[] profilePic;
 
-
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private List<Cashbook> cashbooks;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Cashbook> cashbooks;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
