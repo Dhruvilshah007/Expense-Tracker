@@ -1,4 +1,4 @@
-package com.ds.expensetracker.dto;
+package com.ds.expensetracker.authentication.dto;
 
 
 import lombok.AllArgsConstructor;

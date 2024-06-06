@@ -1,12 +1,12 @@
-package com.ds.expensetracker.controller;
+package com.ds.expensetracker.authentication.controller;
 
 
-import com.ds.expensetracker.dto.LoginResponse;
-import com.ds.expensetracker.dto.LoginUserDto;
-import com.ds.expensetracker.dto.RegisterUserDto;
-import com.ds.expensetracker.model.User;
-import com.ds.expensetracker.service.AuthenticationService;
-import com.ds.expensetracker.util.JwtUtility;
+import com.ds.expensetracker.authentication.dto.LoginResponse;
+import com.ds.expensetracker.authentication.dto.LoginUserDto;
+import com.ds.expensetracker.authentication.dto.RegisterUserDto;
+import com.ds.expensetracker.authentication.model.User;
+import com.ds.expensetracker.authentication.service.AuthenticationService;
+import com.ds.expensetracker.authentication.util.JwtUtility;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +47,8 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(loginResponse);
     }
+
+    // TODO: logout controller
 
 
 }

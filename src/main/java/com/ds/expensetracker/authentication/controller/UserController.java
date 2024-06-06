@@ -1,9 +1,9 @@
-package com.ds.expensetracker.controller;
+package com.ds.expensetracker.authentication.controller;
 
 
-import com.ds.expensetracker.model.User;
-import com.ds.expensetracker.repository.UserRepository;
-import com.ds.expensetracker.service.UserService;
+import com.ds.expensetracker.authentication.model.User;
+import com.ds.expensetracker.authentication.repository.UserRepository;
+import com.ds.expensetracker.authentication.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +37,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping("/getAllUsers")
     public ResponseEntity<List<User>> allUsers() {
         List<User> users = userService.allUsers();
 

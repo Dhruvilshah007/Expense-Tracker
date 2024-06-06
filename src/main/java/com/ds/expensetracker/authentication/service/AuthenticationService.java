@@ -1,10 +1,10 @@
-package com.ds.expensetracker.service;
+package com.ds.expensetracker.authentication.service;
 
 
-import com.ds.expensetracker.dto.LoginUserDto;
-import com.ds.expensetracker.dto.RegisterUserDto;
-import com.ds.expensetracker.model.User;
-import com.ds.expensetracker.repository.UserRepository;
+import com.ds.expensetracker.authentication.dto.LoginUserDto;
+import com.ds.expensetracker.authentication.dto.RegisterUserDto;
+import com.ds.expensetracker.authentication.model.User;
+import com.ds.expensetracker.authentication.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,7 +1,7 @@
-package com.ds.expensetracker.service;
+package com.ds.expensetracker.authentication.service;
 
-import com.ds.expensetracker.model.User;
-import com.ds.expensetracker.repository.UserRepository;
+import com.ds.expensetracker.authentication.model.User;
+import com.ds.expensetracker.authentication.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

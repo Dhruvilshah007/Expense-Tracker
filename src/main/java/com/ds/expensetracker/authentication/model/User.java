@@ -1,12 +1,9 @@
-package com.ds.expensetracker.model;
+package com.ds.expensetracker.authentication.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,12 +11,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "Users", uniqueConstraints = {@UniqueConstraint(columnNames = "emailId")})
-
 public class User extends BaseEntity implements UserDetails {
 
     @Id
@@ -39,6 +36,10 @@ public class User extends BaseEntity implements UserDetails {
     @Temporal(TemporalType.DATE) //Will only store Date
     private Date birthDate;
     private byte[] profilePic;
+
+
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+//    private List<Cashbook> cashbooks;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

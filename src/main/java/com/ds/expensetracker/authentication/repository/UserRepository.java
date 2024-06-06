@@ -1,6 +1,6 @@
-package com.ds.expensetracker.repository;
+package com.ds.expensetracker.authentication.repository;
 
-import com.ds.expensetracker.model.User;
+import com.ds.expensetracker.authentication.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

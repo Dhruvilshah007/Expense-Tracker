@@ -1,4 +1,4 @@
-package com.ds.expensetracker.util;
+package com.ds.expensetracker.authentication.util;
 
 
 import io.jsonwebtoken.Claims;

@@ -1,6 +1,6 @@
-package com.ds.expensetracker.config;
+package com.ds.expensetracker.authentication.config;
 
-import com.ds.expensetracker.repository.UserRepository;
+import com.ds.expensetracker.authentication.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

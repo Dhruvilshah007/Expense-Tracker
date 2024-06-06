@@ -1,4 +1,4 @@
-package com.ds.expensetracker.model;
+package com.ds.expensetracker.authentication.model;
 
 
 import jakarta.persistence.Column;
@@ -11,13 +11,15 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.util.Date;
 
 
-//@MappedSuperclass ensures that the fields in BaseEntity are mapped to the database columns of the subclass table but BaseEntity itself is not a separate table.
+//@MappedSup`erclass ensures that the fields in BaseEntity are mapped to the database columns of the subclass table but BaseEntity itself is not a separate table.
 
 @MappedSuperclass
 @Data
-public abstract  class BaseEntity {
+public abstract class BaseEntity {
 
-    BaseEntity(){
+
+    //added Proctected because were not able to access outside package
+    public BaseEntity(){
         this.activeFlag=1;
     }
 

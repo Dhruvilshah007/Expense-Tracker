@@ -1,6 +1,6 @@
-package com.ds.expensetracker.config;
+package com.ds.expensetracker.authentication.config;
 
-import com.ds.expensetracker.util.JwtUtility;
+import com.ds.expensetracker.authentication.util.JwtUtility;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,8 +55,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String userEmail=jwtUtility.extractUsername(jwt);
 
             Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-
-
 
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
