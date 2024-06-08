@@ -1,6 +1,6 @@
 package com.ds.expensetracker.categories.dto;
 
-import com.ds.expensetracker.authentication.model.BaseEntity;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,11 +12,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDto extends BaseEntity {
+public class CategoryDto{
 
     private long categoryPkId;
 
-    @NotNull
+
+    @NotBlank(message = "Category name is mandatory")
     private String categoryName;
 
 
