@@ -1,6 +1,8 @@
 package com.ds.expensetracker.exception;
 
 import com.ds.expensetracker.exception.cashbook.DuplicateCashbookException;
+import com.ds.expensetracker.exception.commonException.ApplicationException;
+import com.ds.expensetracker.exception.commonException.UnauthorizedActionException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatusCode;
@@ -10,6 +12,8 @@ import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.Instant;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -60,10 +64,28 @@ public class GlobalExceptionHandler {
         return errorDetail;
     }
 
+    @ExceptionHandler(ApplicationException.class)
+    public ProblemDetail handleApplicationException(ApplicationException exception) {
+        ProblemDetail errorDetail = ProblemDetail.forStatus(exception.getStatus());
+        errorDetail.setProperty("errorTitle", exception.getErrorTitle());
+        errorDetail.setProperty("description", exception.getDescription());
+        errorDetail.setProperty("timestamp", Instant.now());
+        return errorDetail;
+    }
+
     @ExceptionHandler(DuplicateCashbookException.class)
     public ProblemDetail handleDuplicateCashbookException(DuplicateCashbookException exception) {
-        ProblemDetail errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), exception.getMessage());
+        ProblemDetail errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(409), exception.getMessage());
         errorDetail.setProperty("description", "Duplicate Cashbook");
+        errorDetail.setProperty("timestamp", Instant.now());
+        return errorDetail;
+    }
+
+    @ExceptionHandler(UnauthorizedActionException.class)
+    public ProblemDetail handleUnauthorizedActionException(UnauthorizedActionException exception) {
+        ProblemDetail errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
+        errorDetail.setProperty("description", "You are not authorized to perform action");
+        errorDetail.setProperty("timestamp", Instant.now());
         return errorDetail;
     }
 }

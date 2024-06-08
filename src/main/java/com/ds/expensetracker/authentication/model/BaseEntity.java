@@ -35,6 +35,4 @@ public abstract class BaseEntity {
     private Date updatedDate;
     private String updatedByIpaddress;
 
-
-
 }
