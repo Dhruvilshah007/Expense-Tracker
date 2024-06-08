@@ -1,4 +1,4 @@
-package com.ds.expensetracker.exception;
+package com.ds.expensetracker.exception.commonException;
 
 public class DuplicateEntityException extends RuntimeException {
 

@@ -1,18 +1,20 @@
 package com.ds.expensetracker.cashbook.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CashbookDto<T>{
+public class CashbookDto{
 
-    private String status;
-    private String message;
+    private long cashbookPkId;
 
-    private T data;
-
+    @NotBlank(message = "Cashbook name is mandatory")
+    private String cashbookName;
 }
