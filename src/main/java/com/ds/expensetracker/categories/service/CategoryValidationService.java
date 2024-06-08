@@ -4,6 +4,7 @@ package com.ds.expensetracker.categories.service;
 import com.ds.expensetracker.cashbook.model.Cashbook;
 import com.ds.expensetracker.categories.model.Categories;
 import com.ds.expensetracker.categories.repository.CategoriesRepository;
+import com.ds.expensetracker.common.constants.CommonConstants;
 import com.ds.expensetracker.exception.commonException.ApplicationException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -37,4 +38,12 @@ public class CategoryValidationService {
         }
     }
 
+    public Categories validateCategoryExists(Long categoryPkId) {
+        return (Categories) categoriesRepository.findByCategoryPkIdAndActiveFlag(categoryPkId, CommonConstants.ACTIVE_FLAG)
+                .orElseThrow(() -> new ApplicationException(
+                        HttpStatusCode.valueOf(404),
+                        "Invalid Category Id",
+                        "The provided Category Id does not exist or is invalid."
+                ));
+    }
 }
