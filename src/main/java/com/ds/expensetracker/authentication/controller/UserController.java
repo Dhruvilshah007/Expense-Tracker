@@ -1,15 +1,17 @@
 package com.ds.expensetracker.authentication.controller;
 
 
+import com.ds.expensetracker.authentication.dto.ResetPasswordDto;
 import com.ds.expensetracker.authentication.model.User;
 import com.ds.expensetracker.authentication.repository.UserRepository;
 import com.ds.expensetracker.authentication.service.UserService;
+import com.ds.expensetracker.exception.commonException.ApplicationException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -43,4 +45,22 @@ public class UserController {
 
         return ResponseEntity.ok(users);
     }
+
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto, HttpServletRequest request) {
+
+        //check If both New passoword are same of not
+        if(!resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmNewPassword())){
+            throw new ApplicationException(
+                    HttpStatusCode.valueOf(403),
+                    "New password doesnt Matches",
+                    "New pasword and Confirm new Password doesnt match"
+            );
+        }
+
+        userService.resetPassword(resetPasswordDto,request.getRemoteAddr());
+        return ResponseEntity.ok("Password Reset Successfully");
+    }
+
 }

@@ -36,6 +36,8 @@ public class User extends BaseEntity implements UserDetails {
     @Email
     @Column(unique = true)
     private String emailId;
+
+    @JsonIgnore
     private String password;
 
     @Temporal(TemporalType.DATE) //Will only store Date
