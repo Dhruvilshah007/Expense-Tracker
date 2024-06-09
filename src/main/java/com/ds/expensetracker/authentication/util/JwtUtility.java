@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,6 +87,15 @@ public class JwtUtility {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public LocalDateTime getExpirationTime(String token) {
+        // Logic to extract expiration time from the token
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey) // your secret key
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getExpiration().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
 }
