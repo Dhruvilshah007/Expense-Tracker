@@ -1,6 +1,7 @@
 package com.ds.expensetracker.authentication.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Temporal;
@@ -24,15 +25,21 @@ public abstract class BaseEntity {
     }
 
     @Column(name = "active_flag", nullable = false, columnDefinition = "int default 1")
+    @JsonIgnore
     private int activeFlag;
 
     @CreationTimestamp  //By default will add currentTimestamp
     @Temporal(TemporalType.TIMESTAMP)   //Will store Date and time both
     private Date createdDate;
+
+    @JsonIgnore
     private String createdByIpaddress;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Date updatedDate;
+
+    @JsonIgnore
     private String updatedByIpaddress;
 
 }

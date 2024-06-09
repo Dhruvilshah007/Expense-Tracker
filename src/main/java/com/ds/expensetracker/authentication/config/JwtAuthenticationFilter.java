@@ -1,11 +1,15 @@
 package com.ds.expensetracker.authentication.config;
 
+import com.ds.expensetracker.authentication.service.BlacklistedTokenService;
 import com.ds.expensetracker.authentication.util.JwtUtility;
+import com.ds.expensetracker.exception.commonException.ApplicationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +30,9 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final HandlerExceptionResolver handlerExceptionResolver;
+
+    @Autowired
+    private BlacklistedTokenService blacklistedTokenService;
 
     private final JwtUtility jwtUtility;
     private final UserDetailsService userDetailsService;
@@ -52,6 +59,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try{
             final String jwt=authHeader.substring(7);
+
+            // Check if the token is blacklisted
+            if (blacklistedTokenService.isTokenBlacklisted(jwt)) {
+                throw new ApplicationException(
+                        HttpStatusCode.valueOf(401 ),
+                        "Unauthorized Access",
+                        "Token is blacklisted"
+                );
+            }
+
             final String userEmail=jwtUtility.extractUsername(jwt);
 
             Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
