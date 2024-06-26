@@ -5,6 +5,9 @@ public class CommonConstants {
     //General response
     public static final String SUCCESS_STATUS = "Success";
 
+
+    public static final String NOT_FOUND = "Not Found";
+
     public static final String CREATED = "Created Successfully";
     public static final String DELETED = "Deleted Successfully";
     public static final String UPDATED = "Updated Successfully";
@@ -14,6 +17,12 @@ public class CommonConstants {
 
 
     //Cashbook
+
+    public static final String CASHBOOK_CREATED = "Cashbook Created Successfully";
+    public static final String CASHBOOK_DELETED = "Cashbook Deleted Successfully";
+    public static final String CASHBOOK_UPDATED = "Cashbook Updated Successfully";
+    public static final String CASHBOOK_NOT_FOUND = "No Cashbook Found";
+    public static final String CASHBOOK_FOUND = "Cashbook Found";
 
     //Categories
 

@@ -8,7 +8,9 @@ import com.ds.expensetracker.authentication.repository.BlacklistedTokenRepositor
 import com.ds.expensetracker.authentication.repository.UserRepository;
 import com.ds.expensetracker.common.constants.CommonConstants;
 import com.ds.expensetracker.common.response.GenericResponse;
+import com.ds.expensetracker.exception.commonException.ApplicationException;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,8 +50,11 @@ public class AuthenticationService {
     public User authenticate(LoginUserDto loginUserDto){
         authenticationManager.authenticate((new UsernamePasswordAuthenticationToken(loginUserDto.getEmailId(),loginUserDto.getPassword())));
 
-        return userRepository.findByEmailId(loginUserDto.getEmailId()).orElseThrow();
-
+        return userRepository.findByEmailId(loginUserDto.getEmailId()).orElseThrow(() -> new ApplicationException(
+                HttpStatusCode.valueOf(404),
+                "Invalid Email Id",
+                "The provided Email Id does not exist or is invalid."
+        ));
     }
 
 

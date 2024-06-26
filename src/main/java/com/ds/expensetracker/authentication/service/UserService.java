@@ -42,4 +42,14 @@ public class UserService {
         userRepository.save(user);
 
     }
+
+    public User updateUser(User user, String remoteAddr) {
+        User updateUser = userRepository.findByEmailId(user.getEmailId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        updateUser.setName(user.getName());
+        updateUser.setBirthDate(user.getBirthDate());
+        updateUser.setUpdatedByIpaddress(remoteAddr);
+        userRepository.save(user);
+        return updateUser;
+    }
 }

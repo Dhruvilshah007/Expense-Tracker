@@ -10,19 +10,14 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class AuthenticationValidationService {
-
     private final UserRepository userRepository;
-
-
     public void checkIfEmailIdExists(String emailId) {
-
         if (!userRepository.findByEmailId(emailId).isEmpty()) {
             throw new ApplicationException(
-                    HttpStatusCode.valueOf(409 ),
+                    HttpStatusCode.valueOf(409),
                     "EmailId already exists ",
                     "EmailId - " + emailId + " is already registered.Please different EmailId"
             );
         }
-
     }
 }
