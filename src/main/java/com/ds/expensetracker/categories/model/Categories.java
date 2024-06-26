@@ -28,7 +28,7 @@ public class Categories extends BaseEntity {
     private String categoryName;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cashbook_id")
     private Cashbook cashbook;
 }

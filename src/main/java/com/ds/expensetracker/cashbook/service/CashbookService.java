@@ -4,12 +4,13 @@ package com.ds.expensetracker.cashbook.service;
 import com.ds.expensetracker.authentication.model.User;
 import com.ds.expensetracker.authentication.repository.UserRepository;
 import com.ds.expensetracker.authentication.util.UserUtility;
+import com.ds.expensetracker.cashbook.dto.CashbookDto;
 import com.ds.expensetracker.cashbook.model.Cashbook;
 import com.ds.expensetracker.cashbook.repository.CashbookRepository;
 import com.ds.expensetracker.common.constants.CommonConstants;
 import com.ds.expensetracker.common.response.GenericResponse;
-import com.ds.expensetracker.exception.commonException.ApplicationException;
-import org.springframework.http.HttpStatusCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,31 +18,28 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CashbookService {
-
-
     private final CashbookRepository cashbookRepository;
     private final UserRepository userRepository;
     private final CashbookValidationService cashbookValidationService;
 
-    public CashbookService(CashbookRepository cashbookRepository, UserRepository userRepository, CashbookValidationService cashbookValidationService) {
-        this.cashbookRepository = cashbookRepository;
-        this.userRepository = userRepository;
-        this.cashbookValidationService = cashbookValidationService;
-    }
-
-    public GenericResponse createCashbook(Cashbook cashbook, String clientIpAddress) {
+    public GenericResponse createCashbook(CashbookDto cashbookDto, String clientIpAddress) {
 
         User user = UserUtility.getCurrentUser();
 
         //validate Duplicate cashbook Name for given user
-        cashbookValidationService.validateDuplicateCashbookName(cashbook.getCashbookName(), user);
+        cashbookValidationService.validateDuplicateCashbookName(cashbookDto.getCashbookName(), user);
 
+        Cashbook cashbook = new Cashbook();
+        BeanUtils.copyProperties(cashbookDto, cashbook);
         cashbook.setUser(user);
         cashbook.setCreatedByIpaddress(clientIpAddress);
         Cashbook savedCashbook = cashbookRepository.save(cashbook);
 
-        return new GenericResponse(CommonConstants.SUCCESS_STATUS, "Cashbook " + CommonConstants.CREATED, cashbook);
+        BeanUtils.copyProperties(savedCashbook, cashbookDto);
+
+        return GenericResponse.builder().status(CommonConstants.SUCCESS_STATUS).message(CommonConstants.CASHBOOK_CREATED).data(cashbookDto).build();
     }
 
     public GenericResponse<List<Cashbook>> getAllCashbookOfUser() {
@@ -49,44 +47,42 @@ public class CashbookService {
         List<Cashbook> cashbookList = cashbookRepository.findAllByUserAndActiveFlag(user, CommonConstants.ACTIVE_FLAG);
 
         GenericResponse genericResponse = new GenericResponse();
-        genericResponse.setStatus("Success");
+        genericResponse.setStatus(CommonConstants.SUCCESS_STATUS);
         if (cashbookList.isEmpty()) {
-            genericResponse.setMessage("No Cashbook found");
+            genericResponse.setMessage(CommonConstants.CASHBOOK_NOT_FOUND);
         } else {
+            genericResponse.setMessage("All Cashbook found");
             genericResponse.setData(cashbookList);
         }
         return genericResponse;
     }
 
 
-    public GenericResponse updateCashbook(long cashbookPkId, Cashbook cashbook) {
-        cashbookValidationService.validateCashbookOwnership(cashbookPkId, UserUtility.getCurrentUserEmail());
+    public GenericResponse updateCashbook(long cashbookPkId, CashbookDto cashbookDto) {
+        Cashbook existingCashbook =cashbookValidationService.validateCashbookOwnership(cashbookPkId, UserUtility.getCurrentUserEmail());
 
-        Cashbook existingCashbook = (Cashbook) cashbookRepository.findByCashbookPkIdAndActiveFlag(cashbookPkId, 1)
-                .orElseThrow(() -> new ApplicationException(HttpStatusCode.valueOf(404), "Not Found", "Cashbook not found"));
-
-        existingCashbook.setCashbookName(cashbook.getCashbookName());
+        BeanUtils.copyProperties(cashbookDto, existingCashbook,"cashbookPkId");
+        existingCashbook.setCashbookName(cashbookDto.getCashbookName());
         Cashbook updatedCashbook = cashbookRepository.save(existingCashbook);
 
-        GenericResponse responseDto = new GenericResponse();
-        responseDto.setStatus("Success");
-        responseDto.setMessage("Cashbook Updated Successfully");
-        responseDto.setData(updatedCashbook);
-        return responseDto;
+        BeanUtils.copyProperties(updatedCashbook, cashbookDto);
+
+        return GenericResponse.builder().status(CommonConstants.SUCCESS_STATUS).message(CommonConstants.CASHBOOK_UPDATED).data(cashbookDto).build();
     }
 
     public GenericResponse deleteCashbook(long cashbookPkId) {
-        cashbookValidationService.validateCashbookOwnership(cashbookPkId,  UserUtility.getCurrentUserEmail());
-
-        Cashbook existingCashbook = cashbookRepository.findById(cashbookPkId)
-                .orElseThrow(() -> new ApplicationException(HttpStatusCode.valueOf(404), "Not Found", "Cashbook not found"));
+        Cashbook existingCashbook=cashbookValidationService.validateCashbookOwnership(cashbookPkId, UserUtility.getCurrentUserEmail());
 
         existingCashbook.setActiveFlag(0);
         cashbookRepository.save(existingCashbook);
 
-        GenericResponse responseDto = new GenericResponse();
-        responseDto.setStatus("Success");
-        responseDto.setMessage("Cashbook Deleted Successfully");
-        return responseDto;
+        return GenericResponse.builder().status(CommonConstants.SUCCESS_STATUS).message(CommonConstants.CASHBOOK_DELETED).build();
+    }
+
+    public CashbookDto getCashbookByCashbookPkId(Long cashbookPkId) {
+
+        Cashbook existingCashbook=cashbookValidationService.validateCashbookOwnership(cashbookPkId, UserUtility.getCurrentUserEmail());
+
+        return CashbookDto.builder().cashbookName(existingCashbook.getCashbookName()).cashbookPkId(existingCashbook.getCashbookPkId()).build();
     }
 }

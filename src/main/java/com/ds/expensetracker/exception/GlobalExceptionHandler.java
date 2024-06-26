@@ -3,6 +3,7 @@ package com.ds.expensetracker.exception;
 import com.ds.expensetracker.exception.cashbook.DuplicateCashbookException;
 import com.ds.expensetracker.exception.commonException.ApplicationException;
 import com.ds.expensetracker.exception.commonException.UnauthorizedActionException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatusCode;
@@ -10,10 +11,13 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -85,6 +89,32 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleUnauthorizedActionException(UnauthorizedActionException exception) {
         ProblemDetail errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
         errorDetail.setProperty("description", "You are not authorized to perform action");
+        errorDetail.setProperty("timestamp", Instant.now());
+        return errorDetail;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ProblemDetail errorDetail = ProblemDetail.forStatus(HttpStatusCode.valueOf(400));
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((org.springframework.validation.FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        errorDetail.setProperty("description", "Validation error");
+        errorDetail.setProperty("errors", errors);
+        errorDetail.setProperty("timestamp", Instant.now());
+        return errorDetail;
+    }
+
+
+    @ExceptionHandler(InvalidFormatException.class)
+    public ProblemDetail handleInvalidFormatException(InvalidFormatException ex) {
+        ProblemDetail errorDetail = ProblemDetail.forStatus(HttpStatusCode.valueOf(400));
+        errorDetail.setProperty("description", "Invalid date format. Please use 'yyyy-MM-dd'.");
         errorDetail.setProperty("timestamp", Instant.now());
         return errorDetail;
     }

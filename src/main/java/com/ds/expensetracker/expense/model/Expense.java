@@ -47,12 +47,12 @@ public class Expense extends BaseEntity {
     // TODO: Add multiple attachment Field
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cashbook_id")
     private Cashbook cashbook;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Categories category;
 

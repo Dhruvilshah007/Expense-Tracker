@@ -4,26 +4,23 @@ import com.ds.expensetracker.authentication.model.User;
 import com.ds.expensetracker.authentication.repository.UserRepository;
 import com.ds.expensetracker.cashbook.model.Cashbook;
 import com.ds.expensetracker.cashbook.repository.CashbookRepository;
+import com.ds.expensetracker.common.constants.CommonConstants;
 import com.ds.expensetracker.exception.commonException.ApplicationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-
+@RequiredArgsConstructor
 @Service
 public class CashbookValidationService {
-
 
     private final CashbookRepository cashbookRepository;
     private final UserRepository userRepository;
 
-    public CashbookValidationService(CashbookRepository cashbookRepository, UserRepository userRepository) {
-        this.cashbookRepository = cashbookRepository;
-        this.userRepository = userRepository;
-    }
 
+    //Not used in cashbook Kept for reference purpose
     public Cashbook validateCashbookExists(Long cashbookPkId) {
-        return cashbookRepository.findById(cashbookPkId)
+        return (Cashbook) cashbookRepository.findByCashbookPkIdAndActiveFlag(cashbookPkId, CommonConstants.ACTIVE_FLAG)
                 .orElseThrow(() -> new ApplicationException(
                         HttpStatusCode.valueOf(404),
                         "Invalid Cashbook Id",
@@ -31,35 +28,26 @@ public class CashbookValidationService {
                 ));
     }
 
-    public void validateUserHasRelationWithCashbook(Long cashbookPkId, User user) {
-        if (!cashbookRepository.existsByCashbookPkIdAndUser(cashbookPkId, user)) {
-            new ApplicationException(
-                    HttpStatusCode.valueOf(404),
-                    "Invalid Cashbook Id",
-                    "No Cashbook Id found for User"
-            );
-        }
-    }
-
-    public void validateCashbookOwnership(long cashbookPkId, String emailId) {
-        Cashbook cashbook = cashbookRepository.findById(cashbookPkId)
+    public Cashbook validateCashbookOwnership(long cashbookPkId, String emailId) {
+        Cashbook cashbook = (Cashbook) cashbookRepository.findByCashbookPkIdAndActiveFlag(cashbookPkId, CommonConstants.ACTIVE_FLAG)
                 .orElseThrow(() -> new ApplicationException(
                         HttpStatusCode.valueOf(404),
                         "Invalid Cashbook Id",
-                        "Cashbook not found"
+                        "The provided Cashbook Id does not exist or is invalid."
                 ));
 
 
-        User user = userRepository.findByEmailId(emailId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = cashbook.getUser();
 
-        if (!cashbook.getUser().getEmailId().equals(emailId)) {
-            new ApplicationException(
+        if (!user.getEmailId().equals(emailId)) {
+            throw new ApplicationException(
                     HttpStatusCode.valueOf(404),
                     "Unauthorized access",
-                    "You are not authorized to update cashbook"
+                    "You are not authorized to access cashbook"
             );
         }
+
+        return cashbook;
     }
 
     public void validateDuplicateCashbookName(String cashbookName, User user) {

@@ -10,6 +10,7 @@ import com.ds.expensetracker.authentication.service.BlacklistedTokenService;
 import com.ds.expensetracker.authentication.util.JwtUtility;
 import com.ds.expensetracker.common.response.GenericResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -27,13 +28,11 @@ import java.time.LocalDateTime;
 public class AuthenticationController {
 
     private final JwtUtility jwtUtility;
-
     private final AuthenticationService authenticationService;
-
     private final BlacklistedTokenService blacklistedTokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<GenericResponse> register(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<GenericResponse> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
         GenericResponse genericResponse = authenticationService.register(registerUserDto);
         return ResponseEntity.ok(genericResponse);
     }
@@ -74,9 +73,4 @@ public class AuthenticationController {
         // If the Authorization header is not valid, return null
         return null;
     }
-
-    // // TODO: 09-06-2024 Forget Password
-    // // // TODO: 09-06-2024 reset password
-
-
 }
