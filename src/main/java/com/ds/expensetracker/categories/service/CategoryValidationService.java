@@ -6,17 +6,14 @@ import com.ds.expensetracker.categories.model.Categories;
 import com.ds.expensetracker.categories.repository.CategoriesRepository;
 import com.ds.expensetracker.common.constants.CommonConstants;
 import com.ds.expensetracker.exception.commonException.ApplicationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryValidationService {
-
     private final CategoriesRepository categoriesRepository;
-
-    public CategoryValidationService(CategoriesRepository categoriesRepository) {
-        this.categoriesRepository = categoriesRepository;
-    }
 
     public void validateDuplicateCategory(String categoryName, Cashbook cashbook) {
         if (categoriesRepository.existsByCategoryNameAndCashbook(categoryName, cashbook)) {
@@ -33,7 +30,7 @@ public class CategoryValidationService {
             throw new ApplicationException(
                     HttpStatusCode.valueOf(403 ),
                     "Unauthorized Access",
-                    "You are not authorized to Update Category"
+                    "You are not authorized to Perform action on Category"
             );
         }
     }
