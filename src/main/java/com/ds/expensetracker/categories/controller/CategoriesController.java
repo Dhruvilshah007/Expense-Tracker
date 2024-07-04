@@ -2,44 +2,40 @@ package com.ds.expensetracker.categories.controller;
 
 
 import com.ds.expensetracker.categories.dto.CategoryDto;
-import com.ds.expensetracker.categories.model.Categories;
 import com.ds.expensetracker.categories.service.CategoriesService;
 import com.ds.expensetracker.common.response.GenericResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/categories")
+@RequestMapping("/cashbook/categories")
 @RestController
+@RequiredArgsConstructor
 public class CategoriesController {
 
-    @Autowired
-    private CategoriesService categoriesService;
+    private final CategoriesService categoriesService;
 
 
-    @PostMapping("/createCategory")
-    public ResponseEntity<GenericResponse> createCashbook(@RequestBody CategoryDto categoryDto, HttpServletRequest request) {
-        GenericResponse genericResponse = categoriesService.createCategory(categoryDto, request.getRemoteAddr());
-        return ResponseEntity.ok(genericResponse);
+    @PostMapping()
+    public ResponseEntity<?> createCashbook(@Valid @RequestBody CategoryDto categoryDto, HttpServletRequest request) {
+        return ResponseEntity.ok(categoriesService.createCategory(categoryDto, request.getRemoteAddr()));
     }
 
-    @GetMapping("/getCategory")
-    public ResponseEntity<Categories> getCategory(@RequestParam long categoryPkId) {
-        Categories categories = categoriesService.getCategory(categoryPkId);
-        return ResponseEntity.ok(categories);
+    @GetMapping("/{categoryPkId}")
+    public ResponseEntity<?> getCategory(@PathVariable Long categoryPkId) {
+        return ResponseEntity.ok(categoriesService.getCategory(categoryPkId));
     }
 
-    @PutMapping("/updateCategory")
-    public ResponseEntity<GenericResponse> updateCategory(@RequestParam long categoryPkId, @RequestBody CategoryDto categoryDto, HttpServletRequest request) {
-        GenericResponse genericResponse = categoriesService.updateCategory(categoryPkId, categoryDto, request.getRemoteAddr());
-        return ResponseEntity.ok(genericResponse);
+    @PutMapping("/{categoryPkId}")
+    public ResponseEntity<?> updateCategory(@PathVariable Long categoryPkId, @RequestBody CategoryDto categoryDto, HttpServletRequest request) {
+        return ResponseEntity.ok(categoriesService.updateCategory(categoryPkId, categoryDto, request.getRemoteAddr()));
     }
 
-    @DeleteMapping("/deleteCategory")
-    public ResponseEntity<GenericResponse> deleteCategory(@RequestParam long categoryPkId, HttpServletRequest request) {
-        GenericResponse genericResponse = categoriesService.deleteCategory(categoryPkId, request.getRemoteAddr());
-        return ResponseEntity.ok(genericResponse);
+    @DeleteMapping("/{categoryPkId}")
+    public ResponseEntity<GenericResponse> deleteCategory(@PathVariable Long categoryPkId, HttpServletRequest request) {
+        return ResponseEntity.ok(categoriesService.deleteCategory(categoryPkId, request.getRemoteAddr()));
     }
 
 }

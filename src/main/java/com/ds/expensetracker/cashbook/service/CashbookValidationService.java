@@ -5,22 +5,17 @@ import com.ds.expensetracker.authentication.repository.UserRepository;
 import com.ds.expensetracker.cashbook.model.Cashbook;
 import com.ds.expensetracker.cashbook.repository.CashbookRepository;
 import com.ds.expensetracker.exception.commonException.ApplicationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class CashbookValidationService {
-
-
     private final CashbookRepository cashbookRepository;
     private final UserRepository userRepository;
-
-    public CashbookValidationService(CashbookRepository cashbookRepository, UserRepository userRepository) {
-        this.cashbookRepository = cashbookRepository;
-        this.userRepository = userRepository;
-    }
 
     public Cashbook validateCashbookExists(Long cashbookPkId) {
         return cashbookRepository.findById(cashbookPkId)
@@ -71,4 +66,6 @@ public class CashbookValidationService {
             );
         }
     }
+
+
 }

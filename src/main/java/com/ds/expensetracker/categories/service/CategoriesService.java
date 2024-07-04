@@ -12,6 +12,7 @@ import com.ds.expensetracker.categories.repository.CategoriesRepository;
 import com.ds.expensetracker.common.constants.CommonConstants;
 import com.ds.expensetracker.common.response.GenericResponse;
 import com.ds.expensetracker.exception.commonException.ApplicationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CategoriesService {
 
     //Constructor Injection instead of Autowired
@@ -26,13 +28,6 @@ public class CategoriesService {
     private final CategoryValidationService categoryValidationService;
     private final CategoriesRepository categoriesRepository;
     private final UserRepository userRepository;
-
-    public CategoriesService(CashbookValidationService cashbookValidationService, CategoryValidationService categoryValidationService, CategoriesRepository categoriesRepository, UserRepository userRepository) {
-        this.cashbookValidationService = cashbookValidationService;
-        this.categoryValidationService = categoryValidationService;
-        this.categoriesRepository = categoriesRepository;
-        this.userRepository = userRepository;
-    }
 
     public GenericResponse createCategory(CategoryDto categoryDto, String clientIpAddress) {
 
@@ -53,6 +48,8 @@ public class CategoriesService {
         categories.setCreatedByIpaddress(clientIpAddress);
 
         Categories savedCategory = categoriesRepository.save(categories);
+
+        BeanUtils.copyProperties(savedCategory, categoryDto);
 
         return new GenericResponse(CommonConstants.SUCCESS_STATUS, "Category " + CommonConstants.CREATED, savedCategory);
     }
