@@ -36,7 +36,7 @@ public class CategoriesService {
 
         // Validate user exists and has relation with cashbook
         User user = UserUtility.getCurrentUser();
-        cashbookValidationService.validateUserHasRelationWithCashbook(cashbook.getCashbookPkId(), user);
+        //cashbookValidationService.validateUserHasRelationWithCashbook(cashbook.getCashbookPkId(), user);
 
         // Validate duplicate category
         categoryValidationService.validateDuplicateCategory(categoryDto.getCategoryName(), cashbook);

@@ -1,6 +1,7 @@
 package com.ds.expensetracker.authentication.controller;
 
 
+import com.ds.expensetracker.authentication.dto.ForgotPasswordRequest;
 import com.ds.expensetracker.authentication.dto.ResetPasswordDto;
 import com.ds.expensetracker.authentication.model.User;
 import com.ds.expensetracker.authentication.repository.UserRepository;
@@ -71,5 +72,16 @@ public class UserController {
     }
 
     // // TODO: 09-06-2024 Forget Password
+
+    @PostMapping("/forgotPassword")
+    public String forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return userService.forgotPassword(request.getEmailId());
+    }
+
+    @PostMapping("/createNewPassword")
+    public ResponseEntity<?> createNewPassword(@RequestParam("token") String token, @RequestBody ResetPasswordDto resetPasswordDto) {
+        return ResponseEntity.ok(userService.createNewPassword(resetPasswordDto, token));
+    }
+
 
 }
