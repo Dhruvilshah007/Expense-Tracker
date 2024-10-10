@@ -1,6 +1,8 @@
 package com.ds.expensetracker.authentication.service;
 
 
+import com.ds.expensetracker.authentication.model.User;
+import com.ds.expensetracker.authentication.repository.UserRepository;
 import com.ds.expensetracker.exception.commonException.ApplicationException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -14,6 +16,8 @@ public class UserValidationService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final UserRepository userRepository;
+
 
     public void validateOldPassword(String oldPasswordEntered, String oldPasswordInDb) {
 
@@ -24,5 +28,15 @@ public class UserValidationService {
                     "Old Password doesn't matches password stored"
             );
         }
+    }
+
+    public User validateEmailId(String emailId) {
+
+        return userRepository.findByEmailId(emailId)
+                .orElseThrow(() -> new ApplicationException(
+                        HttpStatusCode.valueOf(404),
+                        "Invalid Email Id",
+                        "User not found"
+                ));
     }
 }

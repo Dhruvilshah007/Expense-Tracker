@@ -26,4 +26,7 @@ public class CommonConstants {
 
     //Categories
 
+    //Password-Reset
+
+
 }
